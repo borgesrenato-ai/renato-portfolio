@@ -1,0 +1,226 @@
+document.addEventListener("DOMContentLoaded", () => {
+
+  /* =======================================================
+     EXPANDABLE CASES
+     ======================================================= */
+
+  document.querySelectorAll(".case-toggle").forEach((button) => {
+    button.addEventListener("click", () => {
+      const card = button.closest(".featured-case");
+
+      if (!card) return;
+
+      const isOpen = card.classList.toggle("is-open");
+
+      button.textContent = isOpen
+        ? "Close details ↑"
+        : "Explore how it was built ↓";
+    });
+  });
+
+
+  /* =======================================================
+     VIDEO MAP
+     ======================================================= */
+
+  const videos = {
+    "kael": "https://www.youtube.com/embed/bz4NTWlMBMo",
+    "judite": "https://www.youtube.com/embed/a0CkjUpdwEA",
+    "carlao": "https://www.youtube.com/embed/M33uQzqBcP0",
+    "cleitinho": "https://www.youtube.com/embed/NoGP9BwnnKs",
+    "lexy": "https://www.youtube.com/embed/kG5vGlPmnDs",
+    "hector": "https://www.youtube.com/embed/dloWarxRi9Q",
+    "dona-claudete": "https://www.youtube.com/embed/8ay32W9CDhY",
+    "diabo": "https://www.youtube.com/embed/Qn6TLa-E_uk",
+    "pirelli": "https://www.youtube.com/embed/EWpXhXKp5x8",
+    "allonda": "https://www.youtube.com/embed/FTkVR1hZMNU"
+  };
+
+
+  /* =======================================================
+     CREATE MODAL AUTOMATICALLY
+     ======================================================= */
+
+  let modal = document.querySelector("#video-modal");
+
+  if (!modal) {
+    modal = document.createElement("div");
+    modal.id = "video-modal";
+
+    modal.innerHTML = `
+      <div class="rb-video-backdrop"></div>
+
+      <div class="rb-video-dialog">
+        <button
+          class="rb-video-close"
+          type="button"
+          aria-label="Close video"
+        >
+          ×
+        </button>
+
+        <div class="rb-video-frame">
+          <iframe
+            src=""
+            title="Portfolio video"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+  }
+
+  const iframe = modal.querySelector("iframe");
+  const closeButton = modal.querySelector(".rb-video-close");
+  const backdrop = modal.querySelector(".rb-video-backdrop");
+
+
+  /* =======================================================
+     MODAL STYLES — SELF CONTAINED
+     ======================================================= */
+
+  const style = document.createElement("style");
+
+  style.textContent = `
+    #video-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    #video-modal.is-open {
+      display: flex;
+    }
+
+    .rb-video-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(8px);
+    }
+
+    .rb-video-dialog {
+      position: relative;
+      z-index: 2;
+      width: min(1000px, 92vw);
+    }
+
+    .rb-video-frame {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      border-radius: 14px;
+      background: #000;
+      box-shadow: 0 30px 90px rgba(0,0,0,.5);
+    }
+
+    .rb-video-frame iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+
+    .rb-video-close {
+      position: absolute;
+      right: 0;
+      top: -48px;
+      width: 40px;
+      height: 40px;
+      border: 0;
+      border-radius: 50%;
+      cursor: pointer;
+      background: rgba(255,255,255,.14);
+      color: white;
+      font-size: 26px;
+      line-height: 1;
+    }
+
+    .rb-video-close:hover {
+      background: rgba(255,255,255,.25);
+    }
+
+    body.rb-video-open {
+      overflow: hidden;
+    }
+
+    article[data-has-video] .persona-media,
+    article[data-has-video] .evidence-media {
+      cursor: pointer;
+    }
+  `;
+
+  document.head.appendChild(style);
+
+
+  /* =======================================================
+     OPEN / CLOSE
+     ======================================================= */
+
+  function openVideo(url) {
+    iframe.src = `${url}?autoplay=1&rel=0`;
+
+    modal.classList.add("is-open");
+    document.body.classList.add("rb-video-open");
+  }
+
+  function closeVideo() {
+    modal.classList.remove("is-open");
+    document.body.classList.remove("rb-video-open");
+
+    iframe.src = "";
+  }
+
+
+  /* =======================================================
+     CONNECT EACH ARTICLE AUTOMATICALLY
+     ======================================================= */
+
+  Object.entries(videos).forEach(([id, url]) => {
+    const article = document.getElementById(id);
+
+    if (!article) {
+      console.warn(`Video card not found: ${id}`);
+      return;
+    }
+
+    article.dataset.hasVideo = "true";
+
+    const media =
+      article.querySelector(".persona-media") ||
+      article.querySelector(".evidence-media");
+
+    if (!media) {
+      console.warn(`Media area not found: ${id}`);
+      return;
+    }
+
+    media.addEventListener("click", () => {
+      openVideo(url);
+    });
+  });
+
+
+  /* =======================================================
+     CLOSE EVENTS
+     ======================================================= */
+
+  closeButton.addEventListener("click", closeVideo);
+  backdrop.addEventListener("click", closeVideo);
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeVideo();
+    }
+  });
+
+
+  console.log("Portfolio video system ready.");
+});

@@ -1,0 +1,59 @@
+document.querySelectorAll(".case-toggle").forEach((button) => {
+  button.addEventListener("click", () => {
+    const card = button.closest(".featured-case");
+    const isOpen = card.classList.toggle("is-open");
+
+    button.textContent = isOpen
+      ? "Close details ↑"
+      : "Explore how it was built ↓";
+  });
+});
+/* =========================================================
+   MEDIA MODAL
+   ========================================================= */
+
+const mediaModal = document.querySelector("#media-modal");
+const mediaModalIframe = document.querySelector("#media-modal-iframe");
+const mediaModalClose = document.querySelector(".media-modal-close");
+const mediaModalBackdrop = document.querySelector(".media-modal-backdrop");
+
+function openMediaModal(videoUrl) {
+  if (!videoUrl) return;
+
+  const separator = videoUrl.includes("?") ? "&" : "?";
+
+  mediaModalIframe.src =
+    `${videoUrl}${separator}autoplay=1`;
+
+  mediaModal.classList.add("is-open");
+  mediaModal.setAttribute("aria-hidden", "false");
+
+  document.body.classList.add("modal-open");
+}
+
+function closeMediaModal() {
+  mediaModal.classList.remove("is-open");
+  mediaModal.setAttribute("aria-hidden", "true");
+
+  mediaModalIframe.src = "";
+
+  document.body.classList.remove("modal-open");
+}
+
+document.addEventListener("click", (event) => {
+  const trigger = event.target.closest(".video-trigger");
+
+  if (!trigger) return;
+
+  openMediaModal(trigger.dataset.video);
+});
+
+mediaModalClose.addEventListener("click", closeMediaModal);
+mediaModalBackdrop.addEventListener("click", closeMediaModal);
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    closeMediaModal();
+  }
+});
+

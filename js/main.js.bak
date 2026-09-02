@@ -1,0 +1,10 @@
+document.querySelectorAll(".case-toggle").forEach((button) => {
+  button.addEventListener("click", () => {
+    const card = button.closest(".featured-case");
+    const isOpen = card.classList.toggle("is-open");
+
+    button.textContent = isOpen
+      ? "Close details ↑"
+      : "Explore how it was built ↓";
+  });
+});
